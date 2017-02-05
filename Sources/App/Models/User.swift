@@ -44,4 +44,8 @@ final class User: Model {
     static func revert(_ database: Database) throws {
         try database.delete("users")
     }
+    
+    func courses() throws -> Siblings<Course> {
+        return try siblings()
+    }
 }

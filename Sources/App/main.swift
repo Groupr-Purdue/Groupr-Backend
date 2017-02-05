@@ -7,7 +7,8 @@ try drop.addProvider(VaporSQLite.Provider.self)
 
 let preparations = [
     User.self,
-    Course.self
+    Course.self,
+    Pivot<User, Course>.self
 ] as [Preparation.Type]
 drop.preparations += preparations
 
