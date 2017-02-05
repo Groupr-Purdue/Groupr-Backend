@@ -6,7 +6,8 @@ let drop = Droplet()
 try drop.addProvider(VaporSQLite.Provider.self)
 
 let preparations = [
-    User.self
+    User.self,
+    Course.self
 ] as [Preparation.Type]
 drop.preparations += preparations
 
