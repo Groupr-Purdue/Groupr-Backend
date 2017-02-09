@@ -23,4 +23,7 @@ drop.get("users", String.self) { req, val in
     ])
 }
 
+let coursesController = CoursesController()
+drop.resource("/courses", coursesController)
+
 drop.run()
