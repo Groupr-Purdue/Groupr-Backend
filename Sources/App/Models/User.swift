@@ -37,7 +37,7 @@ final class User: Model {
             users.id()
             users.string("first_name", length: nil, optional: true, unique: false, default: nil)
             users.string("last_name", length: nil, optional: true, unique: false, default: nil)
-            users.string("career_account", length: nil, optional: true, unique: true, default: nil)
+            users.string("career_account", length: nil, optional: false, unique: true, default: nil)
         })
     }
     
