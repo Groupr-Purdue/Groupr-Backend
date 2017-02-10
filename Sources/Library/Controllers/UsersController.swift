@@ -1,24 +1,25 @@
 import Vapor
 import HTTP
 
-final class UsersController: ResourceRepresentable {
-    
-    func index(request: Request) throws -> ResponseRepresentable {
+public final class UsersController: ResourceRepresentable {
+    public init() {}
+
+    public func index(request: Request) throws -> ResponseRepresentable {
         let json = try JSON(node: User.all().makeNode())
         return json
     }
-    
-    func store(request: Request) throws -> ResponseRepresentable {
+
+    public func store(request: Request) throws -> ResponseRepresentable {
         var user = try request.user()
         try user.save()
         return user
     }
-    
-    func show(request: Request, user: User) throws -> ResponseRepresentable {
+
+    public func show(request: Request, user: User) throws -> ResponseRepresentable {
         return user
     }
-    
-    func update(request: Request, user: User) throws -> ResponseRepresentable {
+
+    public func update(request: Request, user: User) throws -> ResponseRepresentable {
         let newUser = try request.user()
         var user = user
         user.first_name = newUser.first_name
@@ -27,12 +28,12 @@ final class UsersController: ResourceRepresentable {
         try user.save()
         return user
     }
-    
-    func destroy(request: Request, user: User) throws -> ResponseRepresentable {
+
+    public func destroy(request: Request, user: User) throws -> ResponseRepresentable {
         try user.delete()
         return JSON([:])
     }
-    
+
     public func makeResource() -> Resource<User> {
         return Resource(
             index: index,
@@ -44,8 +45,8 @@ final class UsersController: ResourceRepresentable {
     }
 }
 
-extension Request {
-    func user() throws -> User {
+public extension Request {
+    public func user() throws -> User {
         guard let json = self.json else {
             throw Abort.badRequest
         }
