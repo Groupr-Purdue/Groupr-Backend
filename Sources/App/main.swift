@@ -5,6 +5,7 @@ import Library
 
 // Initialize root Droplet.
 let drop = Droplet()
+drop.middleware.insert(CORSMiddleware(), at: 0)
 try drop.addProvider(VaporSQLite.Provider.self)
 
 // Prepare the SQLite DB if needed on boot.
