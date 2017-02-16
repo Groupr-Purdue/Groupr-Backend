@@ -1,12 +1,12 @@
 import Vapor
-import VaporSQLite
+import VaporPostgreSQL
 import Fluent
 import Library
 
 // Initialize root Droplet.
 let drop = Droplet()
 drop.middleware.insert(CORSMiddleware(), at: 0)
-try drop.addProvider(VaporSQLite.Provider.self)
+try drop.addProvider(VaporPostgreSQL.Provider.self)
 
 // Prepare the SQLite DB if needed on boot.
 // TODO: Move to Model classes.
