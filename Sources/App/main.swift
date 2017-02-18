@@ -11,7 +11,6 @@ try drop.addProvider(VaporPostgreSQL.Provider.self)
 // Prepare the SQLite DB if needed on boot.
 // TODO: Move to Model classes.
 let preparations = [
-    Auth.self,
     User.self,
     Course.self,
     Pivot<User, Course>.self
@@ -22,4 +21,15 @@ drop.preparations += preparations
 // TODO: Dynamically collect controllers.
 drop.resource("/users", UsersController())
 drop.resource("/courses", CoursesController())
+
+drop.get("/authenticate") { req in
+    return try AuthSystem.check_token(req)
+}
+drop.post("/authenticate") { req in
+    return try AuthSystem.issue_token(req)
+}
+drop.patch("/authenticate") { req in
+    return try AuthSystem.refresh_token(req)
+}
+
 drop.run()

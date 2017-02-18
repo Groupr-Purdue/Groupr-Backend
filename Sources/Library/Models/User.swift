@@ -14,12 +14,16 @@ public final class User: Model {
     /// The user's last name.
     public var last_name: String
 
+    // The user's password as a hash.
+    public var password_hash: String
+
     /// The designated initializer.
-    public init(career_account: String, first_name: String, last_name: String) {
+    public init(career_account: String, first_name: String, last_name: String, password_hash: String) {
         self.id = nil
         self.career_account = career_account
         self.first_name = first_name
         self.last_name = last_name
+        self.password_hash = password_hash
     }
 
     /// Internal: Fluent::Model::init(Node, Context).
@@ -28,6 +32,7 @@ public final class User: Model {
         self.career_account = try node.extract("career_account")
         self.first_name = try node.extract("first_name")
         self.last_name = try node.extract("last_name")
+        self.password_hash = try node.extract("password_hash")
     }
 
     /// Internal: Fluent::Model::makeNode(Context).
@@ -37,6 +42,7 @@ public final class User: Model {
             "career_account": career_account,
             "first_name": first_name,
             "last_name": last_name,
+            "password_hash": password_hash,
         ])
     }
 
@@ -55,6 +61,7 @@ extension User: Preparation {
             users.string("career_account", length: nil, optional: false, unique: true, default: nil)
             users.string("first_name", length: nil, optional: true, unique: false, default: nil)
             users.string("last_name", length: nil, optional: true, unique: false, default: nil)
+            users.string("password_hash", length: nil, optional: false, unique: false, default: nil)
         })
     }
 
