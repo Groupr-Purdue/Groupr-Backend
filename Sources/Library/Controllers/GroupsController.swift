@@ -18,8 +18,7 @@ public final class GroupsController: ResourceRepresentable {
 
     /// GET /: Show all group entries.
     public func index(request: Request) throws -> ResponseRepresentable {
-        let json = try JSON(node: Group.all().makeNode())
-        return json
+        return try JSON(node: Group.all().makeNode())
     }
 
     /// POST: Add a new group entry.

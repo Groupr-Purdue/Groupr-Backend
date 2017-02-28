@@ -20,8 +20,7 @@ public final class CoursesController: ResourceRepresentable {
 
     /// GET /: Show all course entries.
     public func index(request: Request) throws -> ResponseRepresentable {
-        let json = try JSON(node: Course.all().makeNode())
-        return json
+        return try JSON(node: Course.all().makeNode())
     }
 
     /// POST: Add a new course entry.

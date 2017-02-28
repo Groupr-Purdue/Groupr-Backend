@@ -17,8 +17,7 @@ public final class EventsController: ResourceRepresentable {
 
     /// GET /: Show all event entries.
     public func index(request: Request) throws -> ResponseRepresentable {
-        let json = try JSON(node: Event.all().makeNode())
-        return json
+        return try JSON(node: Event.all().makeNode())
     }
 
     /// POST: Add a new event entry.

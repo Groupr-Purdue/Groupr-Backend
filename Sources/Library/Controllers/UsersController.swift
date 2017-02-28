@@ -20,8 +20,7 @@ public final class UsersController: ResourceRepresentable {
 
     /// GET /: Show all user entries.
     public func index(request: Request) throws -> ResponseRepresentable {
-        let json = try JSON(node: User.all().makeNode())
-        return json
+        return try JSON(node: User.all().makeNode())
     }
 
     /// POST: Add a new user entry.
