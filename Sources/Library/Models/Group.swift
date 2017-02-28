@@ -2,33 +2,28 @@ import Vapor
 import Fluent
 import HTTP
 
-public final class Course: Model {
+public final class Group: Model {
     public var id: Node?
     public var exists: Bool = false
 
-    /// The course's name (i.e. 'CS 408').
+    /// The group's name (i.e. 'Team 24').
     public var name: String
 
-    /// The course's title (i.e. 'Software Testing').
-    public var title: String
-
-    /// The course's current enrollment (i.e. 40 students).
-    public var enrollment: Int
+    /// The group's connected course (i.e. CS 408).
+    public var courseid: Int
 
     /// The designated initializer.
-    public init(name: String, title: String, enrollment: Int) {
+    public init(name: String, courseid: Int) {
         self.id = nil
         self.name = name
-        self.title = title
-        self.enrollment = enrollment
+        self.courseid = courseid
     }
 
     /// Internal: Fluent::Model::init(Node, Context).
     public init(node: Node, in context: Context) throws {
-        self.id = try? node.extract("id")
+        self.id = try node.extract("id")
         self.name = try node.extract("name")
-        self.title = try node.extract("title")
-        self.enrollment = try node.extract("enrollment")
+        self.courseid = try node.extract("courseid")
     }
 
     /// Internal: Fluent::Model::makeNode(Context).
@@ -36,40 +31,38 @@ public final class Course: Model {
         return try Node(node: [
             "id": id,
             "name": name,
-            "title": title,
-            "enrollment": enrollment
+            "courseid": courseid
         ])
     }
 
     /// Establish a many-to-many relationship with User.
-    public func users() throws -> Siblings<User> {
-        return try siblings()
+    public func course() throws -> Parent<User> {
+        return try parent(self.id)
     }
 }
 
-extension Course: Preparation {
+extension Group: Preparation {
 
     /// Create the Course schema when required in the database.
     public static func prepare(_ database: Database) throws {
-        try database.create("courses", closure: { (courses) in
+        try database.create("chats", closure: { (courses) in
             courses.id()
             courses.string("name", length: nil, optional: false, unique: true, default: nil)
-            courses.string("title", length: nil, optional: true, unique: false, default: nil)
-            courses.int("enrollment", optional: true)
+            courses.int("courseid", optional: false)
         })
     }
 
     /// Delete/revert the Course schema when required in the database.
     public static func revert(_ database: Database) throws {
-        try database.delete("courses")
+        try database.delete("chats")
     }
 }
 
 public extension Request {
-    public func course() throws -> Course {
+    public func group() throws -> Group {
         guard let json = self.json else {
             throw Abort.badRequest
         }
-        return try Course(node: json)
+        return try Group(node: json)
     }
 }
