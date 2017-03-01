@@ -27,6 +27,11 @@ public final class CoursesController: ResourceRepresentable {
     public func store(request: Request) throws -> ResponseRepresentable {
         var course = try request.course()
         try course.save()
+        try RealtimeController.send(try JSON(node: [
+            "endpoint": "courses",
+            "method": "store",
+            "item": course
+        ]))
         return course
     }
 
@@ -43,6 +48,11 @@ public final class CoursesController: ResourceRepresentable {
         course.name = newCourse.name
         course.enrollment = newCourse.enrollment
         try course.save()
+        try RealtimeController.send(try JSON(node: [
+            "endpoint": "courses",
+            "method": "update",
+            "item": course
+        ]))
         return course
     }
 
@@ -50,6 +60,11 @@ public final class CoursesController: ResourceRepresentable {
     public func destroy(request: Request, course: Course) throws -> ResponseRepresentable {
         let ret_course = course
         try course.delete()
+        try RealtimeController.send(try JSON(node: [
+            "endpoint": "courses",
+            "method": "destroy",
+            "item": ret_course
+        ]))
         return ret_course
     }
 }

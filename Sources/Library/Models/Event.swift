@@ -7,7 +7,7 @@ public final class Event: Model {
     public var exists: Bool = false
 
     /// The attached course id (where it was sent/triggered).
-    public var course_id: String
+    public var group_id: String
 
     /// The attached user id (who sent/triggered it).
     public var user_id: String
@@ -19,9 +19,9 @@ public final class Event: Model {
     public var timestamp: Int
 
     /// The designated initializer.
-    public init(course_id: String, user_id: String, message: String, timestamp: Int) {
+    public init(group_id: String, user_id: String, message: String, timestamp: Int) {
         self.id = nil
-        self.course_id = course_id
+        self.group_id = group_id
         self.user_id = user_id
         self.message = message
         self.timestamp = timestamp
@@ -30,7 +30,7 @@ public final class Event: Model {
     /// Internal: Fluent::Model::init(Node, Context).
     public init(node: Node, in context: Context) throws {
         self.id = try? node.extract("id")
-        self.course_id = try node.extract("course_id")
+        self.group_id = try node.extract("group_id")
         self.user_id = try node.extract("user_id")
         self.message = try node.extract("message")
         self.timestamp = try node.extract("timestamp")
@@ -40,7 +40,7 @@ public final class Event: Model {
     public func makeNode(context: Context) throws -> Node {
         return try Node(node: [
             "id": id,
-            "course_id": course_id,
+            "group_id": group_id,
             "user_id": user_id,
             "message": message,
             "timestamp": timestamp,
@@ -48,8 +48,8 @@ public final class Event: Model {
     }
 
     /// Define a one-to-one ER relationship with Course.
-    public func course() throws -> Parent<Course> {
-        return try parent(self.id) /*course_id*/
+    public func course() throws -> Parent<Group> {
+        return try parent(self.id) /*group_id*/
     }
 
     /// Define a one-to-one ER relationship with User.

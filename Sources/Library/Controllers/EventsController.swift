@@ -24,6 +24,11 @@ public final class EventsController: ResourceRepresentable {
     public func store(request: Request) throws -> ResponseRepresentable {
         var event = try request.event()
         try event.save()
+        try RealtimeController.send(try JSON(node: [
+            "endpoint": "events",
+            "method": "store",
+            "item": event
+        ]))
         return event
     }
 

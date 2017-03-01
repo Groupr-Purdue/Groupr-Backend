@@ -31,6 +31,11 @@ public final class UsersController: ResourceRepresentable {
         }
         newUser.password_hash = try self.droplet.hash.make(password)
         try newUser.save()
+        try RealtimeController.send(try JSON(node: [
+            "endpoint": "users",
+            "method": "store",
+            "item": newUser
+        ]))
         return newUser
     }
 
@@ -47,6 +52,11 @@ public final class UsersController: ResourceRepresentable {
         user.last_name = newUser.last_name
         user.career_account = newUser.career_account
         try user.save()
+        try RealtimeController.send(try JSON(node: [
+            "endpoint": "users",
+            "method": "update",
+            "item": user
+        ]))
         return user
     }
 
@@ -54,6 +64,11 @@ public final class UsersController: ResourceRepresentable {
     public func destroy(request: Request, user: User) throws -> ResponseRepresentable {
         let ret_user = user
         try user.delete()
+        try RealtimeController.send(try JSON(node: [
+            "endpoint": "users",
+            "method": "destroy",
+            "item": ret_user
+        ]))
         return ret_user
     }
 }

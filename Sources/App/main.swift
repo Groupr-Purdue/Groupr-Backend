@@ -62,7 +62,7 @@ drop.group(protect) { route in
 }
 
 // Enable WebSocket realtime communication.
-drop.socket("chat", handler: GroupEventsController.handle)
+drop.socket("/realtime", String.self, handler: RealtimeController.handle)
 drop.run()
 
 // Notes:

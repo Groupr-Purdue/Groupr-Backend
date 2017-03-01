@@ -25,6 +25,11 @@ public final class GroupsController: ResourceRepresentable {
     public func store(request: Request) throws -> ResponseRepresentable {
         var group = try request.group()
         try group.save()
+        try RealtimeController.send(try JSON(node: [
+            "endpoint": "groups",
+            "method": "store",
+            "item": group
+        ]))
         return group
     }
 
@@ -37,6 +42,11 @@ public final class GroupsController: ResourceRepresentable {
     public func destroy(request: Request, group: Group) throws -> ResponseRepresentable {
         let ret_group = group
         try group.delete()
+        try RealtimeController.send(try JSON(node: [
+            "endpoint": "groups",
+            "method": "destroy",
+            "item": ret_group
+        ]))
         return ret_group
     }
 }
