@@ -15,6 +15,10 @@ public final class AuthController {
 
     /// POST: Authenticates with the platform as a user.
     public func login(request: Request) throws -> ResponseRepresentable {
+        //let users = try User.query()
+        //              .filter("career_account", x)
+        //              .filter("password_hash", y)
+        //              .all()
         /*
         guard let id = req.data["id"]?.string else {
             throw Abort.badRequest

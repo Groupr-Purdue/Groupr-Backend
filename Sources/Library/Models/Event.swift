@@ -64,8 +64,8 @@ extension Event: Preparation {
     public static func prepare(_ database: Database) throws {
         try database.create("events", closure: { (events) in
             events.id()
-            events.string("course_id", length: nil, optional: false, unique: true, default: nil)
-            events.string("user_id", length: nil, optional: true, unique: false, default: nil)
+            events.parent(Course.self)
+            events.parent(User.self)
             events.string("message", length: nil, optional: true, unique: false, default: nil)
             events.int("timestamp", optional: true, unique: false, default: nil)
         })

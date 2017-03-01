@@ -45,16 +45,16 @@ extension Group: Preparation {
 
     /// Create the Course schema when required in the database.
     public static func prepare(_ database: Database) throws {
-        try database.create("chats", closure: { (courses) in
-            courses.id()
-            courses.string("name", length: nil, optional: false, unique: true, default: nil)
-            courses.int("courseid", optional: false)
+        try database.create("groups", closure: { (groups) in
+            groups.id()
+            groups.parent(Course.self)
+            groups.string("name", length: nil, optional: false, unique: true, default: nil)
         })
     }
 
     /// Delete/revert the Course schema when required in the database.
     public static func revert(_ database: Database) throws {
-        try database.delete("chats")
+        try database.delete("groups")
     }
 }
 

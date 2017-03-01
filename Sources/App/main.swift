@@ -28,7 +28,7 @@ try drop.addProvider(VaporSQLite.Provider.self)
 
 // Prepare the SQLite DB if needed on boot.
 // TODO: Move to Model classes.
-let preparations = [
+drop.preparations += [
     Group.self,
     Library.Event.self,
     Library.User.self,
@@ -37,7 +37,6 @@ let preparations = [
     Pivot<Group, Course>.self,
     Pivot<Group, Library.Event>.self
 ] as [Preparation.Type]
-drop.preparations += preparations
 
 // Create all endpoint controllers.
 let authenticate = AuthController(droplet: drop)
@@ -61,4 +60,14 @@ drop.group(protect) { route in
     route.resource("/groups", groups)
     route.resource("/events", events)
 }
+
+// Enable WebSocket realtime communication.
+drop.socket("chat", handler: GroupEventsController.handle)
 drop.run()
+
+// Notes:
+// let test = request.parameters["id"]?.int
+// let test = request.query?["test"]?.int
+// let test = request.json?["test"]?.int
+// TODO: Figure out auth middleware.
+// TODO: Figure out relations/pivots as API.
