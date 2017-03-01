@@ -7,7 +7,7 @@ public final class RealtimeController {
 
     public static func send(_ json: JSON, exclude: String? = nil) throws {
         for (key, socket) in connections {
-            guard let e = exclude, key != e else { continue }
+            if let e = exclude, key == e { continue }
             try socket.send(json.serialize())
         }
     }
