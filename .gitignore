@@ -70,3 +70,5 @@ Packages
 xcuserdata
 *.xcodeproj
 Config/secrets
+
+groupr.sqlite

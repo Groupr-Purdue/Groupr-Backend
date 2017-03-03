@@ -2,38 +2,12 @@ import Vapor
 import HTTP
 
 public final class CoursesController: ResourceRepresentable {
-    public init() {}
-
-    public func index(request: Request) throws -> ResponseRepresentable {
-        let json = try JSON(node: Course.all().makeNode())
-        return json
+    var droplet: Droplet
+    public init(droplet: Droplet) {
+        self.droplet = droplet
     }
 
-    public func store(request: Request) throws -> ResponseRepresentable {
-        var course = try request.course()
-        try course.save()
-        return course
-    }
-
-    public func show(request: Request, course: Course) throws -> ResponseRepresentable {
-        return course
-    }
-
-    public func update(request: Request, course: Course) throws -> ResponseRepresentable {
-        let newCourse = try request.course()
-        var course = course
-        course.title = newCourse.title
-        course.name = newCourse.name
-        course.enrollment = newCourse.enrollment
-        try course.save()
-        return course
-    }
-
-    public func destroy(request: Request, course: Course) throws -> ResponseRepresentable {
-        try course.delete()
-        return JSON([:])
-    }
-
+    // replace, clear, about* -- ?
     public func makeResource() -> Resource<Course> {
         return Resource(
             index: index,
@@ -43,13 +17,54 @@ public final class CoursesController: ResourceRepresentable {
             destroy: destroy
         )
     }
-}
 
-public extension Request {
-    public func course() throws -> Course {
-        guard let json = self.json else {
-            throw Abort.badRequest
-        }
-        return try Course(node: json)
+    /// GET /: Show all course entries.
+    public func index(request: Request) throws -> ResponseRepresentable {
+        return try JSON(node: Course.all().makeNode())
+    }
+
+    /// POST: Add a new course entry.
+    public func store(request: Request) throws -> ResponseRepresentable {
+        var course = try request.course()
+        try course.save()
+        try RealtimeController.send(try JSON(node: [
+            "endpoint": "courses",
+            "method": "store",
+            "item": course
+        ]))
+        return course
+    }
+
+    /// GET: Show the course entry.
+    public func show(request: Request, course: Course) throws -> ResponseRepresentable {
+        return course
+    }
+
+    /// PUT: Update the course entry completely.
+    public func update(request: Request, course: Course) throws -> ResponseRepresentable {
+        let newCourse = try request.course()
+        var course = course
+        course.title = newCourse.title
+        course.name = newCourse.name
+        course.enrollment = newCourse.enrollment
+        try course.save()
+        try RealtimeController.send(try JSON(node: [
+            "endpoint": "courses",
+            "method": "update",
+            "item": course
+        ]))
+        return course
+    }
+
+    /// DELETE: Delete the course entry and return the course that was deleted.
+    public func destroy(request: Request, course: Course) throws -> ResponseRepresentable {
+        let ret_course = course
+        try course.delete()
+        try RealtimeController.send(try JSON(node: [
+            "endpoint": "courses",
+            "method": "destroy",
+            "item": ret_course
+        ]))
+        return ret_course
     }
 }
