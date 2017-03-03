@@ -54,12 +54,12 @@ drop.post("/authenticate") { request in
 drop.get("/authenticate", handler: authenticate.login)
 drop.delete("/authenticate", handler: authenticate.logout)
 drop.get("/me", handler: authenticate.me)
-drop.group(protect) { route in
-    route.resource("/users", users)
-    route.resource("/courses", courses)
-    route.resource("/groups", groups)
-    route.resource("/events", events)
-}
+//drop.group(protect) { route in
+    drop.resource("/users", users)
+    drop.resource("/courses", courses)
+    drop.resource("/groups", groups)
+    drop.resource("/events", events)
+//}
 
 // Enable WebSocket realtime communication.
 drop.socket("/realtime", String.self, handler: RealtimeController.handle)
