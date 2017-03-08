@@ -1,3 +1,4 @@
+import Foundation
 import Vapor
 import Fluent
 import HTTP
@@ -28,6 +29,9 @@ public final class User: Model {
     /// The authentication password hash.
     public var password_hash: String
 
+    /// The authentication token for api calls
+    public var token: String
+
 
 
     /// The designated initializer.
@@ -37,6 +41,7 @@ public final class User: Model {
         self.first_name = first_name
         self.last_name = last_name
         self.password_hash = BCrypt.hash(password: rawPassword)
+        self.token = User.generateToken()
     }
 
     /// Internal: Fluent::Model::init(Node, Context).
@@ -46,6 +51,7 @@ public final class User: Model {
         self.first_name = try node.extract("first_name")
         self.last_name = try node.extract("last_name")
         self.password_hash = (try? node.extract("password_hash")) ?? ""
+        self.token = try node.extract("token")
     }
 
     /// Internal: Fluent::Model::makeNode(Context).
@@ -56,24 +62,26 @@ public final class User: Model {
             "first_name": first_name,
             "last_name": last_name,
             "password_hash": password_hash,
+            "token": token
         ])
     }
-
-    /// User registration method
-    public static func register(career_account: String, rawPassword: String) throws -> User {
-        var newUser = User(career_account: career_account, first_name: "", last_name: "", rawPassword: rawPassword)
-        if try User.query().filter("career_account", newUser.career_account as NodeRepresentable).first() == nil {
-            try newUser.save()
-            return newUser
-        } else {
-            throw AccountTakenError()
-        }
+    
+    /// Returns the user object without the password field
+    public func userJson() throws -> ResponseRepresentable  {
+        return try JSON(node: [
+            "id" : self.id,
+            "career_account": self.career_account,
+            "first_name": self.first_name,
+            "last_name": self.last_name,
+            "token": self.token
+            ])
     }
 
     /// Define a many-to-many ER relationship with Course.
     public func courses() throws -> Siblings<Course> {
         return try siblings()
     }
+
 }
 
 extension User: Preparation {
@@ -86,6 +94,7 @@ extension User: Preparation {
             users.string("first_name", length: nil, optional: true, unique: false, default: nil)
             users.string("last_name", length: nil, optional: true, unique: false, default: nil)
             users.string("password_hash", length: nil, optional: true, unique: false, default: nil)
+            users.string("token", length: nil, optional: false, unique: true, default: nil)
         })
     }
 
@@ -101,5 +110,37 @@ extension Request {
             throw Abort.badRequest
         }
         return try User(node: json)
+    }
+}
+
+/// Authentication and Registration
+extension User {
+    
+    /// User registration method
+    public static func register(career_account: String, rawPassword: String) throws -> User {
+        var newUser = User(career_account: career_account, first_name: "", last_name: "", rawPassword: rawPassword)
+        if try User.query().filter("career_account", newUser.career_account as NodeRepresentable).first() == nil {
+            try newUser.save()
+            return newUser
+        } else {
+            throw AccountTakenError()
+        }
+    }
+    
+    /// Token generation method
+    static func generateToken(length: Int = 20) -> String {
+        let base = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+        var token: String = ""
+        
+        for _ in 0..<length {
+            let randomValue = arc4random_uniform(UInt32(base.characters.count))
+            token += "\(base[base.index(base.startIndex, offsetBy: Int(randomValue))])"
+        }
+        return token
+    }
+    
+    /// Validates if given password is the correct password for this user
+    public func passwordValid(rawPassword: String) throws -> Bool {
+        return try BCrypt.verify(password: rawPassword, matchesHash: self.password_hash)
     }
 }

@@ -47,8 +47,8 @@ let events = EventsController(droplet: drop)
 
 // Define the set of all controllers with named endpoints.
 // TODO: Dynamically collect controllers.
-drop.get("/authenticate", handler: authenticate.login)
-drop.delete("/authenticate", handler: authenticate.logout)
+drop.post("/login", handler: authenticate.login)
+drop.delete("/logout", handler: authenticate.logout)
 drop.get("/me", handler: authenticate.me)
 //drop.group(protect) { route in
     drop.resource("/users", users)

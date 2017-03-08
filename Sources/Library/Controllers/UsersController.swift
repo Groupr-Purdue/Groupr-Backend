@@ -68,6 +68,6 @@ public final class UsersController: ResourceRepresentable {
             return JSON("Missing career_account or password")
         }
         let newUser = try User.register(career_account: career_account, rawPassword: rawPassword)
-        return newUser
+        return try newUser.userJson()
     }
 }
