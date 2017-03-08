@@ -1,6 +1,8 @@
 import Vapor
 import Fluent
 import HTTP
+import Turnstile
+import TurnstileCrypto
 
 public final class User: Model {
 
@@ -26,13 +28,15 @@ public final class User: Model {
     /// The authentication password hash.
     public var password_hash: String
 
+
+
     /// The designated initializer.
-    public init(career_account: String, first_name: String, last_name: String, password_hash: String) {
+    public init(career_account: String, first_name: String, last_name: String, rawPassword: String) {
         self.id = nil
         self.career_account = career_account
         self.first_name = first_name
         self.last_name = last_name
-        self.password_hash = password_hash
+        self.password_hash = BCrypt.hash(password: rawPassword)
     }
 
     /// Internal: Fluent::Model::init(Node, Context).
@@ -53,6 +57,17 @@ public final class User: Model {
             "last_name": last_name,
             "password_hash": password_hash,
         ])
+    }
+
+    /// User registration method
+    public static func register(career_account: String, rawPassword: String) throws -> User {
+        var newUser = User(career_account: career_account, first_name: "", last_name: "", rawPassword: rawPassword)
+        if try User.query().filter("career_account", newUser.career_account as NodeRepresentable).first() == nil {
+            try newUser.save()
+            return newUser
+        } else {
+            throw AccountTakenError()
+        }
     }
 
     /// Define a many-to-many ER relationship with Course.

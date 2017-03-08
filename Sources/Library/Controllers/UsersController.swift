@@ -5,38 +5,26 @@ public final class UsersController: ResourceRepresentable {
     var droplet: Droplet
     public init(droplet: Droplet) {
         self.droplet = droplet
+        registerRoutes()
     }
 
     // replace, clear, about* -- ?
     public func makeResource() -> Resource<User> {
         return Resource(
             index: index,
-            store: store,
             show: show,
             modify: update,
             destroy: destroy
         )
     }
 
+    public func registerRoutes() {
+      droplet.post("register", handler: register)
+    }
+
     /// GET /: Show all user entries.
     public func index(request: Request) throws -> ResponseRepresentable {
         return try JSON(node: User.all().makeNode())
-    }
-
-    /// POST: Add a new user entry.
-    public func store(request: Request) throws -> ResponseRepresentable {
-        var newUser = try request.user()
-        guard let password = request.json?["password"]?.string else {
-            throw Abort.custom(status: .preconditionFailed, message: "missing password field")
-        }
-        newUser.password_hash = try self.droplet.hash.make(password)
-        try newUser.save()
-        try RealtimeController.send(try JSON(node: [
-            "endpoint": "users",
-            "method": "store",
-            "item": newUser
-        ]))
-        return newUser
     }
 
     /// GET: Show the user entry.
@@ -70,5 +58,16 @@ public final class UsersController: ResourceRepresentable {
             "item": ret_user
         ]))
         return ret_user
+    }
+
+    /// POST: Registers the user entry and returns the user
+    public func register(request: Request) throws -> ResponseRepresentable {
+        guard let career_account = request.json?["career_account"]?.string,
+        let rawPassword = request.json?["password"]?.string
+        else {
+            return JSON("Missing career_account or password")
+        }
+        let newUser = try User.register(career_account: career_account, rawPassword: rawPassword)
+        return newUser
     }
 }

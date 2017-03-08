@@ -47,10 +47,6 @@ let events = EventsController(droplet: drop)
 
 // Define the set of all controllers with named endpoints.
 // TODO: Dynamically collect controllers.
-drop.post("/authenticate") { request in
-    let user = try users.store(request: request)
-    return user//try JSON(node: ["auth": "success", "user": user])
-}
 drop.get("/authenticate", handler: authenticate.login)
 drop.delete("/authenticate", handler: authenticate.logout)
 drop.get("/me", handler: authenticate.me)
