@@ -1,7 +1,6 @@
 import Vapor
 import HTTP
 
-/// Note: doesn't support registering.
 public final class AuthController {
     var droplet: Droplet
     public init(droplet: Droplet) {

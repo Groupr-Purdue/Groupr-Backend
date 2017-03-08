@@ -5,7 +5,6 @@ public final class UsersController: ResourceRepresentable {
     var droplet: Droplet
     public init(droplet: Droplet) {
         self.droplet = droplet
-        registerRoutes()
     }
 
     // replace, clear, about* -- ?

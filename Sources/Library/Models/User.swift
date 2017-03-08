@@ -19,6 +19,11 @@ public final class User: Model {
 
     /// The user's Purdue Career Account email.
     public var career_account: String
+    
+    /// The user's purdue email
+    public var email: String {
+        return "\(career_account)@purdue.edu"
+    }
 
     /// The user's first name.
     public var first_name: String
@@ -71,6 +76,7 @@ public final class User: Model {
         return try JSON(node: [
             "id" : self.id,
             "career_account": self.career_account,
+            "email": self.email,
             "first_name": self.first_name,
             "last_name": self.last_name,
             "token": self.token
