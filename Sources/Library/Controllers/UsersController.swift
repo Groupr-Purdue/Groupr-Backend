@@ -35,7 +35,7 @@ public final class UsersController: ResourceRepresentable {
         return try user.userJson()
     }
 
-    /// PUT: Update the user entry completely.
+    /// Patch: Update the user entry.
     public func update(request: Request, user: User) throws -> ResponseRepresentable {
         guard try User.authorize(user, withRequest: request) else {
             return try JSON(node: ["error" : "Not authorized"])
@@ -51,10 +51,10 @@ public final class UsersController: ResourceRepresentable {
             "method": "update",
             "item": user
         ]))
-        return user
+        return try user.userJson()
     }
 
-    /// DELETE: Delete the user entry and return the user that was deleted.
+    /// DELETE: Delete the user entry and return a HTTP 204 No-Content status
     public func destroy(request: Request, user: User) throws -> ResponseRepresentable {
         guard try User.authorize(user, withRequest: request) else {
             return try JSON(node: ["error" : "Not authorized"]).makeResponse()
