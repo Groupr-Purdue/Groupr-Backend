@@ -1,5 +1,6 @@
 import Vapor
 import Fluent
+import HTTP
 
 public final class Course: Model {
     public var id: Node?
@@ -24,7 +25,7 @@ public final class Course: Model {
 
     /// Internal: Fluent::Model::init(Node, Context).
     public init(node: Node, in context: Context) throws {
-        self.id = try node.extract("id")
+        self.id = try? node.extract("id")
         self.name = try node.extract("name")
         self.title = try node.extract("title")
         self.enrollment = try node.extract("enrollment")
@@ -61,5 +62,14 @@ extension Course: Preparation {
     /// Delete/revert the Course schema when required in the database.
     public static func revert(_ database: Database) throws {
         try database.delete("courses")
+    }
+}
+
+public extension Request {
+    public func course() throws -> Course {
+        guard let json = self.json else {
+            throw Abort.badRequest
+        }
+        return try Course(node: json)
     }
 }
