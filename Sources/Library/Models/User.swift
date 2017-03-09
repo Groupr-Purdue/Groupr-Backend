@@ -18,18 +18,18 @@ public final class User: Model {
     public var exists: Bool = false
 
     /// The user's Purdue Career Account email.
-    public var career_account: String
+    public var career_account: String?
     
     /// The user's purdue email
     public var email: String {
-        return "\(career_account)@purdue.edu"
+        return "\(career_account!)@purdue.edu"
     }
 
     /// The user's first name.
-    public var first_name: String
+    public var first_name: String?
 
     /// The user's last name.
-    public var last_name: String
+    public var last_name: String?
 
     /// The authentication password hash.
     public var password_hash: String
@@ -52,11 +52,11 @@ public final class User: Model {
     /// Internal: Fluent::Model::init(Node, Context).
     public init(node: Node, in context: Context) throws {
         self.id = try? node.extract("id")
-        self.career_account = try node.extract("career_account")
-        self.first_name = try node.extract("first_name")
-        self.last_name = try node.extract("last_name")
+        self.career_account = try? node.extract("career_account")
+        self.first_name = try? node.extract("first_name")
+        self.last_name = try? node.extract("last_name")
         self.password_hash = (try? node.extract("password_hash")) ?? ""
-        self.token = try node.extract("token")
+        self.token = try node.extract("token") ?? ""
     }
 
     /// Internal: Fluent::Model::makeNode(Context).
@@ -132,7 +132,7 @@ extension User {
     /// User registration method
     public static func register(career_account: String, rawPassword: String) throws -> User {
         var newUser = User(career_account: career_account, first_name: "", last_name: "", rawPassword: rawPassword)
-        if try User.query().filter("career_account", newUser.career_account as NodeRepresentable).first() == nil {
+        if try User.query().filter("career_account", newUser.career_account as! NodeRepresentable).first() == nil {
             try newUser.save()
             return newUser
         } else {

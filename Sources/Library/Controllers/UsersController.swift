@@ -42,9 +42,9 @@ public final class UsersController: ResourceRepresentable {
         }
         let newUser = try request.user()
         var user = user
-        user.first_name = newUser.first_name
-        user.last_name = newUser.last_name
-        user.career_account = newUser.career_account
+        if let firstName = newUser.first_name { user.first_name = firstName }
+        if let lastName = newUser.last_name { user.first_name = lastName }
+        if let careerAccount = newUser.career_account { user.career_account = careerAccount }
         try user.save()
         try RealtimeController.send(try JSON(node: [
             "endpoint": "users",
