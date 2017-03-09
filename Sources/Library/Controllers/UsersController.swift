@@ -21,18 +21,25 @@ public final class UsersController: ResourceRepresentable {
       droplet.post("register", handler: register)
     }
 
-    /// GET /: Show all user entries.
+    /// GET : Show all user entries.
     public func index(request: Request) throws -> ResponseRepresentable {
-        return try JSON(node: User.all().makeNode())
+        return try JSON(node: User.all().makeNode(context: UserSensitiveContext()))
     }
-
+    
     /// GET: Show the user entry.
     public func show(request: Request, user: User) throws -> ResponseRepresentable {
-        return user
+        guard try User.authorize(user, withRequest: request) else {
+            return try JSON(node: ["error" : "Not authorized"])
+        }
+        
+        return try user.userJson()
     }
 
     /// PUT: Update the user entry completely.
     public func update(request: Request, user: User) throws -> ResponseRepresentable {
+        guard try User.authorize(user, withRequest: request) else {
+            return try JSON(node: ["error" : "Not authorized"])
+        }
         let newUser = try request.user()
         var user = user
         user.first_name = newUser.first_name
@@ -49,6 +56,9 @@ public final class UsersController: ResourceRepresentable {
 
     /// DELETE: Delete the user entry and return the user that was deleted.
     public func destroy(request: Request, user: User) throws -> ResponseRepresentable {
+        guard try User.authorize(user, withRequest: request) else {
+            return try JSON(node: ["error" : "Not authorized"]).makeResponse()
+        }
         let ret_user = user
         try user.delete()
         try RealtimeController.send(try JSON(node: [
@@ -56,7 +66,7 @@ public final class UsersController: ResourceRepresentable {
             "method": "destroy",
             "item": ret_user
         ]))
-        return ret_user
+        return try Response(status: .noContent, json: JSON(nil))
     }
 
     /// POST: Registers the user entry and returns the user

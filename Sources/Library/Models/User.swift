@@ -61,26 +61,33 @@ public final class User: Model {
 
     /// Internal: Fluent::Model::makeNode(Context).
     public func makeNode(context: Context) throws -> Node {
-        return try Node(node: [
+        var node: [String: NodeRepresentable?] = [
             "id": id,
             "career_account": career_account,
             "first_name": first_name,
             "last_name": last_name,
             "password_hash": password_hash,
-            "token": token
-        ])
+            "token": token,
+            ]
+        if context is UserSensitiveContext {
+            node.removeValue(forKey: "password_hash")
+            node.removeValue(forKey: "token")
+        }
+        
+        return try Node(node: node)
     }
     
     /// Returns the user object without the password field
     public func userJson() throws -> ResponseRepresentable  {
-        return try JSON(node: [
+        let dictionary: [String:NodeRepresentable?] = [
             "id" : self.id,
             "career_account": self.career_account,
             "email": self.email,
             "first_name": self.first_name,
             "last_name": self.last_name,
             "token": self.token
-            ])
+        ]
+        return try JSON(node: dictionary)
     }
 
     /// Define a many-to-many ER relationship with Course.
@@ -148,5 +155,23 @@ extension User {
     /// Validates if given password is the correct password for this user
     public func passwordValid(rawPassword: String) throws -> Bool {
         return try BCrypt.verify(password: rawPassword, matchesHash: self.password_hash)
+    }
+    
+    /// Returns a user based on the authorization token in the request
+    class public func authenticateWithToken(fromRequest request: Request) throws -> User? {
+        guard let token = request.auth.header?.header, let user = try User.query().filter("token", token).first() else {
+           return nil
+        }
+        return user
+    }
+    
+    class public func authorize(_ user: User, withRequest request: Request) throws -> Bool{
+        guard let currentUser = try User.authenticateWithToken(fromRequest: request) else {
+            return false
+        }
+        guard currentUser.id == user.id else {
+            return false
+        }
+        return true
     }
 }
