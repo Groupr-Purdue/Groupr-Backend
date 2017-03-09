@@ -113,7 +113,18 @@ public final class CoursesController: ResourceRepresentable {
             // Auth token not provided or token not valid
             return try JSON(node: ["error" : "Not authorized"]).makeResponse()
         }
-
+        let users = try course.users().all()
+        let exists = users.contains { (User) -> Bool in
+            for u in users {
+                if u.id == user.id {
+                    return true
+                }
+            }
+            return false
+        }
+        if exists {
+            return try JSON(node: ["error" : "User already enrolled"]).makeResponse()
+        }
         var pivot = Pivot<Course, User>(course, user)
         try pivot.save()
         
