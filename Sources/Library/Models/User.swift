@@ -146,8 +146,12 @@ extension User {
         var token: String = ""
         
         for _ in 0..<length {
-            let randomValue = arc4random_uniform(UInt32(base.characters.count))
-            token += "\(base[base.index(base.startIndex, offsetBy: Int(randomValue))])"
+            #if os(Linux)
+                let randomValue = Int(random() % (base.characters.count + 1))
+            #else
+                let randomValue = Int(arc4random_uniform(UInt32(base.characters.count)))
+            #endif
+            token += "\(base[base.index(base.startIndex, offsetBy: randomValue)])"
         }
         return token
     }
