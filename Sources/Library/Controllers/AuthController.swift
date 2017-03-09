@@ -1,5 +1,6 @@
 import Vapor
 import HTTP
+import Auth
 
 public final class AuthController {
     var droplet: Droplet
@@ -9,7 +10,10 @@ public final class AuthController {
 
     /// GET /: Returns your own user when authenticated.
     public func me(request: Request) throws -> ResponseRepresentable {
-        return try JSON(node: request.auth_user().makeNode())
+        guard let user = try User.authenticateWithToken(fromRequest: request) else {
+            return try JSON(node: ["error": "Not Authorized"])
+        }
+        return try user.userJson()
     }
 
     /// POST: Authenticates user with password and returns the respective user
@@ -28,10 +32,11 @@ public final class AuthController {
     /// DELETE: Deauthenticate user by expiring the current user token and generating a new one
     public func logout(request: Request) throws -> ResponseRepresentable {
         guard let token = request.auth.header?.header, var user = try User.query().filter("token", token).first() else {
-            return try JSON(node: ["error": "Not Authenticated"])
+            return try JSON(node: ["error": "Not Authorized"])
         }
         user.token = User.generateToken()
         try user.save()
         return try JSON(node: ["success": "User logged out"])
     }
 }
+

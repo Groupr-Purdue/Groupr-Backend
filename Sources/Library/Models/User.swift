@@ -165,6 +165,7 @@ extension User {
         return user
     }
     
+    /// Checks to see if the authorization token in the request correlates to a given user
     class public func authorize(_ user: User, withRequest request: Request) throws -> Bool{
         guard let currentUser = try User.authenticateWithToken(fromRequest: request) else {
             return false
