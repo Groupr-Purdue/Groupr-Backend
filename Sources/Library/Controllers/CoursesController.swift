@@ -1,4 +1,5 @@
 import Vapor
+import Fluent
 import HTTP
 
 public final class CoursesController: ResourceRepresentable {
@@ -21,6 +22,7 @@ public final class CoursesController: ResourceRepresentable {
     public func registerRoutes() {
         droplet.group("courses", ":id") { courses in
             courses.get("users", handler: users)
+            courses.post("users", handler: addUser)
         }
     }
 
@@ -95,6 +97,27 @@ public final class CoursesController: ResourceRepresentable {
         }
         
         return try JSON(node: course.users().all().makeNode(context: UserSensitiveContext()))
+    }
+    
+    /// POST: Adds a user to a course
+    public func addUser(request: Request) throws -> ResponseRepresentable {
+        guard let courseId = request.parameters["id"]?.int else {
+            // Bad course id in request
+            throw Abort.badRequest
+        }
+        guard let course = try Course.find(courseId) else {
+            // Course doesn't exist
+            throw Abort.notFound
+        }
+        guard let user = try User.authenticateWithToken(fromRequest: request) else {
+            // Auth token not provided or token not valid
+            return try JSON(node: ["error" : "Not authorized"]).makeResponse()
+        }
+
+        var pivot = Pivot<Course, User>(course, user)
+        try pivot.save()
+        
+        return try JSON(node: ["Success": "User added"])
     }
 
 }
