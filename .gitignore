@@ -72,3 +72,7 @@ xcuserdata
 Config/secrets
 
 groupr.sqlite
+
+# Don't save bundle.js or index.html after Frontend build
+/Public/bundle.js
+/Public/index.html
