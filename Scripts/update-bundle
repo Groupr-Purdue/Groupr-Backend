@@ -1,5 +1,6 @@
 #!/bin/bash
 
+mkdir -p Public
 git submodule update --remote Groupr-Frontend
 
 cd Groupr-Frontend || exit
@@ -10,7 +11,7 @@ elif hash npm
 then
   npm i
 else 
-  echo need yarn or npm to install node packages
+  echo I need yarn or npm to install node packages.
   exit 1
 fi
 
