@@ -28,13 +28,13 @@ public final class UsersController: ResourceRepresentable {
     public func index(request: Request) throws -> ResponseRepresentable {
         return try JSON(node: User.all().makeNode(context: UserSensitiveContext()))
     }
-    
+
     /// GET: Show the user entry.
     public func show(request: Request, user: User) throws -> ResponseRepresentable {
         guard try User.authorize(user, withRequest: request) else {
             return try JSON(node: ["error" : "Not authorized"])
         }
-        
+
         return try user.userJson()
     }
 
@@ -75,14 +75,16 @@ public final class UsersController: ResourceRepresentable {
     /// POST: Registers the user entry and returns the user
     public func register(request: Request) throws -> ResponseRepresentable {
         guard let career_account = request.json?["career_account"]?.string,
-        let rawPassword = request.json?["password"]?.string
+        let rawPassword = request.json?["password"]?.string,
+        let firstName = request.json?["first_name"]?.string,
+        let lastName = request.json?["last_name"]?.string
         else {
-            return JSON("Missing career_account or password")
+            return try JSON(node: ["error": "Missing credentials"])
         }
-        let newUser = try User.register(career_account: career_account, rawPassword: rawPassword)
+        let newUser = try User.register(career_account: career_account, rawPassword: rawPassword, first_name: firstName, last_name: lastName)
         return try newUser.userJson()
     }
-    
+
     /// GET: Returns the courses the user is enrolled in
     public func courses(request: Request) throws -> ResponseRepresentable {
         guard let userId = request.parameters["id"]?.int else {

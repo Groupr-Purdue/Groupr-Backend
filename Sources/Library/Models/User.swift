@@ -19,7 +19,7 @@ public final class User: Model {
 
     /// The user's Purdue Career Account email.
     public var career_account: String?
-    
+
     /// The user's purdue email
     public var email: String {
         return "\(career_account!)@purdue.edu"
@@ -73,10 +73,10 @@ public final class User: Model {
             node.removeValue(forKey: "password_hash")
             node.removeValue(forKey: "token")
         }
-        
+
         return try Node(node: node)
     }
-    
+
     /// Returns the user object without the password field
     public func userJson() throws -> ResponseRepresentable  {
         let dictionary: [String:NodeRepresentable?] = [
@@ -128,10 +128,10 @@ extension Request {
 
 /// Authentication and Registration
 extension User {
-    
+
     /// User registration method
-    public static func register(career_account: String, rawPassword: String) throws -> User {
-        var newUser = User(career_account: career_account, first_name: "", last_name: "", rawPassword: rawPassword)
+    public static func register(career_account: String, rawPassword: String, first_name: String, last_name: String) throws -> User {
+        var newUser = User(career_account: career_account, first_name: first_name, last_name: last_name, rawPassword: rawPassword)
         if try User.query().filter("career_account", newUser.career_account as! NodeRepresentable).first() == nil {
             try newUser.save()
             return newUser
@@ -139,12 +139,12 @@ extension User {
             throw AccountTakenError()
         }
     }
-    
+
     /// Token generation method
     static func generateToken(length: Int = 20) -> String {
         let base = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
         var token: String = ""
-        
+
         for _ in 0..<length {
             #if os(Linux)
                 let randomValue = Int(random() % (base.characters.count + 1))
@@ -155,12 +155,12 @@ extension User {
         }
         return token
     }
-    
+
     /// Validates if given password is the correct password for this user
     public func passwordValid(rawPassword: String) throws -> Bool {
         return try BCrypt.verify(password: rawPassword, matchesHash: self.password_hash)
     }
-    
+
     /// Returns a user based on the authorization token in the request
     class public func authenticateWithToken(fromRequest request: Request) throws -> User? {
         guard let token = request.auth.header?.header, let user = try User.query().filter("token", token).first() else {
@@ -168,7 +168,7 @@ extension User {
         }
         return user
     }
-    
+
     /// Checks to see if the authorization token in the request correlates to a given user
     class public func authorize(_ user: User, withRequest request: Request) throws -> Bool{
         guard let currentUser = try User.authenticateWithToken(fromRequest: request) else {
