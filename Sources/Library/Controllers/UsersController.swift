@@ -18,7 +18,10 @@ public final class UsersController: ResourceRepresentable {
     }
 
     public func registerRoutes() {
-      droplet.post("register", handler: register)
+        droplet.post("register", handler: register)
+        droplet.group("users", ":id") { users in
+            users.get("courses", handler: courses)
+        }
     }
 
     /// GET : Show all user entries.
@@ -78,5 +81,19 @@ public final class UsersController: ResourceRepresentable {
         }
         let newUser = try User.register(career_account: career_account, rawPassword: rawPassword)
         return try newUser.userJson()
+    }
+    
+    /// GET: Returns the courses the user is enrolled in
+    public func courses(request: Request) throws -> ResponseRepresentable {
+        guard let userId = request.parameters["id"]?.int else {
+            throw Abort.badRequest
+        }
+        guard let user = try User.find(userId) else {
+            throw Abort.notFound
+        }
+        guard try User.authorize(user, withRequest: request) else {
+            return try JSON(node: ["error" : "Not authorized"]).makeResponse()
+        }
+        return try user.courses().all().makeJSON()
     }
 }

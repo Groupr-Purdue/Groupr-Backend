@@ -38,6 +38,8 @@ drop.delete("/logout", handler: authenticate.logout)
 drop.get("/me", handler: authenticate.me)
 
 users.registerRoutes()
+courses.registerRoutes()
+
 drop.resource("/users", users)
 drop.resource("/courses", courses)
 drop.resource("/groups", groups)
