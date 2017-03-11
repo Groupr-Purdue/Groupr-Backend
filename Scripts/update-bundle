@@ -17,8 +17,8 @@ fi
 
 node_modules/.bin/webpack --config dev.webpack.config.js --color --progress
 
-mkdir -p ../Public/Assets/Javascripts
-mv bundle.js ../Public/Assets/Javascripts
+mkdir -p ../Public
+mv bundle.js ../Public
 
 mkdir -p ../Resources/Views
 cp assets/html/index.html ../Resources/Views
