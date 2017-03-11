@@ -16,7 +16,11 @@ else
 fi
 
 node_modules/.bin/webpack --config dev.webpack.config.js --color --progress
-mv bundle.js ../Public
-cp assets/html/index.html ../Public
-cd ..
 
+mkdir -p ../Public/Assets/Javascripts
+mv bundle.js ../Public/Assets/Javascripts
+
+mkdir -p ../Resources/Views
+cp assets/html/index.html ../Resources/Views
+
+cd ..
