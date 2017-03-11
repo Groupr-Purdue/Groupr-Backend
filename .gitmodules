@@ -1,0 +1,3 @@
+[submodule "Groupr-Frontend"]
+	path = Groupr-Frontend
+	url = git@github.com:Groupr-Purdue/Groupr-Frontend.git

@@ -1,0 +1,26 @@
+#!/bin/bash
+
+mkdir -p Public
+git submodule update --init --remote Groupr-Frontend
+
+cd Groupr-Frontend || exit
+if hash yarn 
+then
+  yarn
+elif hash npm
+then
+  npm i
+else 
+  echo I need yarn or npm to install node packages.
+  exit 1
+fi
+
+node_modules/.bin/webpack --config dev.webpack.config.js --color --progress
+
+mkdir -p ../Public/Assets/Javascripts
+mv bundle.js ../Public/Assets/Javascripts
+
+mkdir -p ../Resources/Views
+cp assets/html/index.html ../Resources/Views
+
+cd ..
