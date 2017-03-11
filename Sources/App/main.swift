@@ -33,6 +33,9 @@ let events = EventsController(droplet: drop)
 
 // Define the set of all controllers with named endpoints.
 // TODO: Dynamically collect controllers.
+drop.get("/") { request in
+  return try drop.view.make("index.html")
+}
 drop.post("/login", handler: authenticate.login)
 drop.delete("/logout", handler: authenticate.logout)
 drop.get("/me", handler: authenticate.me)
@@ -45,7 +48,10 @@ drop.resource("/courses", courses)
 drop.resource("/groups", groups)
 drop.resource("/events", events)
 
-
 // Enable WebSocket realtime communication.
 drop.socket("/realtime", String.self, handler: RealtimeController.handle)
+
+drop.get("#", "*") { request in
+    return try drop.view.make("index.html")
+}
 drop.run()
