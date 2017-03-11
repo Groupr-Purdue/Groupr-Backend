@@ -74,5 +74,5 @@ Config/secrets
 groupr.sqlite
 
 # Don't save bundle.js or index.html after Frontend build
-/Public/Assets/Javascripts/bundle.js
+/Public/bundle.js
 /Resources/Views/index.html
