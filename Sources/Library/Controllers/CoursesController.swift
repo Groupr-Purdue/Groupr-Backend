@@ -125,8 +125,13 @@ public final class CoursesController: ResourceRepresentable {
         if exists {
             return try JSON(node: ["error" : "User already enrolled"]).makeResponse()
         }
-        var pivot = Pivot<Course, User>(course, user)
-        try pivot.save()
+        let enrollmentNode = try JSON(node: [
+            "course_id": course.id,
+            "user_id": user.id,
+            "is_staff": false
+        ])
+        var enrollment = try Enrollment(node: enrollmentNode)
+        try enrollment.save()
         
         return try JSON(node: ["Success": "User added"])
     }

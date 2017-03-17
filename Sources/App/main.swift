@@ -19,7 +19,7 @@ drop.preparations += [
     Library.Event.self,
     Library.User.self,
     Course.self,
-    Pivot<Library.User, Course>.self,
+    Enrollment.self,
     Pivot<Group, Course>.self,
     Pivot<Group, Library.Event>.self
 ] as [Preparation.Type]
