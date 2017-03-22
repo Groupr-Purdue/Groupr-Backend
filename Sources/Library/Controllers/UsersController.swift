@@ -81,8 +81,12 @@ public final class UsersController: ResourceRepresentable {
         else {
             return try JSON(node: ["error": "Missing credentials"])
         }
-        let newUser = try User.register(career_account: career_account, rawPassword: rawPassword, first_name: firstName, last_name: lastName)
-        return try newUser.userJson()
+        if let newUser = try? User.register(career_account: career_account, rawPassword: rawPassword, first_name: firstName, last_name: lastName) {
+            return try newUser.userJson()
+        }
+        let response = Response(status: .conflict, headers: ["Content-Type": "text/json"], body: try JSON(node: ["error" : "Account already registered"]))
+        return response
+        //return try JSON(node: ["error" : "Account already registered"])
     }
 
     /// GET: Returns the courses the user is enrolled in
