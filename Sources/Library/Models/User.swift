@@ -132,14 +132,16 @@ extension User {
     /// User registration method
     public static func register(career_account: String, rawPassword: String, first_name: String, last_name: String) throws -> User {
         var newUser = User(career_account: career_account, first_name: first_name, last_name: last_name, rawPassword: rawPassword)
-        if try User.query().filter("career_account", newUser.career_account as! NodeRepresentable).first() == nil {
-            print("user: \(newUser)")
-            try newUser.save()
-            return newUser
-        } else {
-            print("Account taken")
-            throw AccountTakenError()
-        }
+        try newUser.save()
+        return newUser
+//        if try User.query().filter("career_account", newUser.career_account as! NodeRepresentable).first() == nil {
+//            print("user: \(newUser)")
+//            try newUser.save()
+//            return newUser
+//        } else {
+//            print("Account taken")
+//            throw AccountTakenError()
+//        }
     }
 
     /// Token generation method
