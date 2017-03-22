@@ -136,6 +136,7 @@ extension User {
             try newUser.save()
             return newUser
         } else {
+            print("Account taken")
             throw AccountTakenError()
         }
     }
