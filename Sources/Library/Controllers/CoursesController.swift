@@ -142,7 +142,7 @@ public final class CoursesController: ResourceRepresentable {
             // Course doesn't exist
             throw Abort.notFound
         }
-        return try JSON(node: course.groups().all())
+        return try JSON(node: course.groups().all().makeNode(context: GroupResponseContext()))
     }
     
     public func addGroup(request: Request) throws -> ResponseRepresentable {

@@ -28,12 +28,15 @@ public final class Group: Model {
 
     /// Internal: Fluent::Model::makeNode(Context).
     public func makeNode(context: Context) throws -> Node {
-        return try Node(node: [
+        var node: [String: NodeRepresentable?] = [
             "id": id,
             "name": name,
-            "course_id": courseId,
-            "members": users().all().makeNode(context: UserSensitiveContext())   // Does not get stored in db. Simply used for response.
-        ])
+            "course_id": courseId
+        ]
+        if context is GroupResponseContext {
+            node["members"] = try users().all().makeNode(context: UserSensitiveContext())
+        }
+        return try Node(node: node)
     }
     
     /// Define a many-to-many ER relationship with User.

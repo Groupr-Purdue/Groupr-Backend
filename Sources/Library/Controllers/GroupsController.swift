@@ -27,7 +27,7 @@ public final class GroupsController: ResourceRepresentable {
 
     /// GET /: Show all group entries.
     public func index(request: Request) throws -> ResponseRepresentable {
-        return try JSON(node: Group.all().makeNode())
+        return try JSON(node: Group.all().makeNode(context: GroupResponseContext()))
     }
 
     /// POST: Add a new group entry.
@@ -44,7 +44,7 @@ public final class GroupsController: ResourceRepresentable {
 
     /// GET: Show the group entry.
     public func show(request: Request, group: Group) throws -> ResponseRepresentable {
-        return group
+        return try JSON(node: group.makeNode(context: GroupResponseContext()))
     }
 
     /// DELETE: Delete the group entry and return the group that was deleted.
