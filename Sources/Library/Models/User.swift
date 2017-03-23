@@ -94,6 +94,11 @@ public final class User: Model {
     public func courses() throws -> Siblings<Course> {
         return try siblings()
     }
+    
+    /// Define a many-to-many ER relationship with Course.
+    public func groups() throws -> Siblings<Group> {
+        return try siblings()
+    }
 
 }
 

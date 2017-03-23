@@ -1,4 +1,5 @@
 import Vapor
+import Fluent
 import HTTP
 
 public final class GroupsController: ResourceRepresentable {
@@ -14,6 +15,14 @@ public final class GroupsController: ResourceRepresentable {
             show: show,
             destroy: destroy
         )
+    }
+    
+    public func registerRoutes() {
+        droplet.group("groups", ":id") { groups in
+            groups.get("users", handler: users)
+            groups.post("users", handler: addUser)
+            groups.delete("users", handler: leaveGroup)
+        }
     }
 
     /// GET /: Show all group entries.
@@ -49,4 +58,66 @@ public final class GroupsController: ResourceRepresentable {
         ]))
         return ret_group
     }
+    
+    public func users(request: Request) throws -> ResponseRepresentable {
+        guard let groupId = request.parameters["id"]?.int else {
+            // Bad group id in request
+            throw Abort.badRequest
+        }
+        guard let group = try Group.find(groupId) else {
+            // Group doesn't exist
+            throw Abort.notFound
+        }
+        return try JSON(node: ["members": group.users().all().makeNode(context: UserSensitiveContext())])
+    }
+    
+    public func addUser(request: Request) throws -> ResponseRepresentable {
+        guard let groupId = request.parameters["id"]?.int else {
+            // Bad group id in request
+            throw Abort.badRequest
+        }
+        guard let group = try Group.find(groupId) else {
+            // Group doesn't exist
+            throw Abort.notFound
+        }
+        guard let user = try User.authenticateWithToken(fromRequest: request) else {
+            // Auth token not provided or token not valid
+            return try JSON(node: ["error" : "Not authorized"]).makeResponse()
+        }
+        let users = try group.users().all()
+        let exists = users.contains { (User) -> Bool in
+            for u in users {
+                if u.id == user.id {
+                    return true
+                }
+            }
+            return false
+        }
+        if exists {
+            return try JSON(node: ["error" : "User already in group"]).makeResponse()
+        }
+        var pivot = Pivot<Group, User>(group, user)
+        try pivot.save()
+        
+        return try JSON(node: ["Success": "User added to group"])
+    }
+    
+    func leaveGroup(request: Request) throws -> ResponseRepresentable {
+        guard let groupId = request.parameters["id"]?.int else {
+            // Bad group id in request
+            throw Abort.badRequest
+        }
+        guard let group = try Group.find(groupId) else {
+            // Group doesn't exist
+            throw Abort.notFound
+        }
+        guard let user = try User.authenticateWithToken(fromRequest: request) else {
+            // Auth token not provided or token not valid
+            return try JSON(node: ["error" : "Not authorized"]).makeResponse()
+        }
+        let pivot = try Pivot<Group, User>.query().filter("group_id", groupId).filter("user_id", user.id!)
+        try pivot.delete()
+        return try JSON(node: ["Success": "User removed from group"])
+    }
+    
 }
