@@ -20,7 +20,7 @@ drop.preparations += [
     Library.User.self,
     Course.self,
     Pivot<Library.User, Course>.self,
-    Pivot<Group, Course>.self,
+    Pivot<Group, Library.User>.self,
     Pivot<Group, Library.Event>.self
 ] as [Preparation.Type]
 
@@ -42,6 +42,7 @@ drop.get("/me", handler: authenticate.me)
 
 users.registerRoutes()
 courses.registerRoutes()
+groups.registerRoutes()
 
 drop.resource("/users", users)
 drop.resource("/courses", courses)

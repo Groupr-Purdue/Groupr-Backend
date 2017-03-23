@@ -10,34 +10,43 @@ public final class Group: Model {
     public var name: String
 
     /// The group's connected course (i.e. CS 408).
-    public var courseid: Int
+    public var courseId: Int
 
     /// The designated initializer.
     public init(name: String, courseid: Int) {
         self.id = nil
         self.name = name
-        self.courseid = courseid
+        self.courseId = courseid
     }
 
     /// Internal: Fluent::Model::init(Node, Context).
     public init(node: Node, in context: Context) throws {
         self.id = try node.extract("id")
         self.name = try node.extract("name")
-        self.courseid = try node.extract("courseid")
+        self.courseId = try node.extract("course_id")
     }
 
     /// Internal: Fluent::Model::makeNode(Context).
     public func makeNode(context: Context) throws -> Node {
-        return try Node(node: [
+        var node: [String: NodeRepresentable?] = [
             "id": id,
             "name": name,
-            "courseid": courseid
-        ])
+            "course_id": courseId
+        ]
+        if context is GroupResponseContext {
+            node["members"] = try users().all().makeNode(context: UserSensitiveContext())
+        }
+        return try Node(node: node)
     }
-
-    /// Establish a many-to-many relationship with User.
-    public func course() throws -> Parent<User> {
-        return try parent(self.id)
+    
+    /// Define a many-to-many ER relationship with User.
+    public func users() throws -> Siblings<User> {
+        return try siblings()
+    }
+    
+    /// Establish a parent-child relation with Course
+    public func course() throws -> Parent<Course> {
+        return try parent(Node(courseId))
     }
 }
 

@@ -23,6 +23,8 @@ public final class CoursesController: ResourceRepresentable {
         droplet.group("courses", ":id") { courses in
             courses.get("users", handler: users)
             courses.post("users", handler: addUser)
+            courses.get("groups", handler: groups)
+            courses.post("groups", handler: addGroup)
         }
     }
 
@@ -129,6 +131,31 @@ public final class CoursesController: ResourceRepresentable {
         try pivot.save()
         
         return try JSON(node: ["Success": "User added"])
+    }
+    
+    public func groups(request: Request) throws -> ResponseRepresentable {
+        guard let courseId = request.parameters["id"]?.int else {
+            // Bad course id in request
+            throw Abort.badRequest
+        }
+        guard let course = try Course.find(courseId) else {
+            // Course doesn't exist
+            throw Abort.notFound
+        }
+        return try JSON(node: course.groups().all().makeNode(context: GroupResponseContext()))
+    }
+    
+    public func addGroup(request: Request) throws -> ResponseRepresentable {
+        guard let courseId = request.parameters["id"]?.int else {
+            // Bad course id in request
+            throw Abort.badRequest
+        }
+        guard let name = request.json?["name"]?.string else {
+            return try JSON(node: ["error": "Group name required"])
+        }
+        var newGroup = Group(name: name, courseid: courseId)
+        try newGroup.save()
+        return newGroup
     }
 
 }

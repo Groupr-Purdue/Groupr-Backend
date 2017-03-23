@@ -45,6 +45,11 @@ public final class Course: Model {
     public func users() throws -> Siblings<User> {
         return try siblings()
     }
+    
+    /// Establish parent-children relation with Group
+    public func groups() throws -> Children<Group> {
+        return try children()
+    }
 }
 
 extension Course: Preparation {
