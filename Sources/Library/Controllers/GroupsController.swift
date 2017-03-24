@@ -33,6 +33,10 @@ public final class GroupsController: ResourceRepresentable {
     /// POST: Add a new group entry.
     public func store(request: Request) throws -> ResponseRepresentable {
         var group = try request.group()
+        guard let course = try Course.find(group.courseId) else {
+            // Course doesn't exist
+            return try Response(status: .notFound, headers: ["Content-Type" : "application/json"], body: JSON(node: ["failure": "Course does not exist"]))
+        }
         try group.save()
         try RealtimeController.send(try JSON(node: [
             "endpoint": "groups",

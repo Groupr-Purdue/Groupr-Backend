@@ -150,6 +150,10 @@ public final class CoursesController: ResourceRepresentable {
             // Bad course id in request
             throw Abort.badRequest
         }
+        guard let course = try Course.find(courseId) else {
+            // Course doesn't exist
+            return try Response(status: .notFound, headers: ["Content-Type" : "application/json"], body: JSON(node: ["failure": "Course does not exist"]))
+        }
         guard let name = request.json?["name"]?.string else {
             return try JSON(node: ["error": "Group name required"])
         }
