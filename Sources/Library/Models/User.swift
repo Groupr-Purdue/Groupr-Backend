@@ -155,6 +155,7 @@ extension User {
 
         for _ in 0..<length {
             #if os(Linux)
+                srand(UInt32(time(nil)))
                 let randomValue = Int(random() % (base.characters.count + 1))
             #else
                 let randomValue = Int(arc4random_uniform(UInt32(base.characters.count)))
