@@ -21,11 +21,11 @@ public final class AuthController {
         guard let careerAccount = request.json?["career_account"]?.string, let user = try User.query().filter("career_account", careerAccount).first() else {
             return try JSON(node: ["error": "Incorrect career account or password"])
         }
-        
+
         guard let rawPassword = request.json?["password"]?.string, try user.passwordValid(rawPassword: rawPassword) else {
             return try JSON(node: ["error": "Incorrect career account or password"])
         }
-        
+
         return try user.userJson()
     }
 
@@ -34,9 +34,6 @@ public final class AuthController {
         guard let token = request.auth.header?.header, var user = try User.query().filter("token", token).first() else {
             return try JSON(node: ["error": "Not Authorized"])
         }
-        user.token = User.generateToken()
-        try user.save()
         return try JSON(node: ["success": "User logged out"])
     }
 }
-

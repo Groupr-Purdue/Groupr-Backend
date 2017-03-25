@@ -7,7 +7,6 @@ public final class RealtimeController {
 
     public static func send(_ json: JSON, exclude: String? = nil) throws {
         for (key, socket) in connections {
-            if let e = exclude, key == e { continue }
             try socket.send(json.serialize())
         }
     }
@@ -22,11 +21,7 @@ public final class RealtimeController {
         ws.onText = { ws, text in
             let json = try JSON(bytes: Array(text.utf8))
             if let g = json.object?["group"]?.string, let m = json.object?["message"]?.string {
-                try RealtimeController.send(try JSON(node: [
-                    "username": username,
-                    "group": g,
-                    "message": m
-                ]), exclude: username)
+
             }
         }
     }

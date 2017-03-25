@@ -16,7 +16,7 @@ public final class GroupsController: ResourceRepresentable {
             destroy: destroy
         )
     }
-    
+
     public func registerRoutes() {
         droplet.group("groups", ":id") { groups in
             groups.get("users", handler: users)
@@ -62,7 +62,7 @@ public final class GroupsController: ResourceRepresentable {
         ]))
         return ret_group
     }
-    
+
     public func users(request: Request) throws -> ResponseRepresentable {
         guard let groupId = request.parameters["id"]?.int else {
             // Bad group id in request
@@ -74,7 +74,7 @@ public final class GroupsController: ResourceRepresentable {
         }
         return try JSON(node: ["members": group.users().all().makeNode(context: UserSensitiveContext())])
     }
-    
+
     public func addUser(request: Request) throws -> ResponseRepresentable {
         guard let groupId = request.parameters["id"]?.int else {
             // Bad group id in request
@@ -102,10 +102,10 @@ public final class GroupsController: ResourceRepresentable {
         }
         var pivot = Pivot<Group, User>(group, user)
         try pivot.save()
-        
+
         return try JSON(node: ["Success": "User added to group"])
     }
-    
+
     func leaveGroup(request: Request) throws -> ResponseRepresentable {
         guard let groupId = request.parameters["id"]?.int else {
             // Bad group id in request
@@ -123,5 +123,5 @@ public final class GroupsController: ResourceRepresentable {
         try pivot.delete()
         return try JSON(node: ["Success": "User removed from group"])
     }
-    
+
 }

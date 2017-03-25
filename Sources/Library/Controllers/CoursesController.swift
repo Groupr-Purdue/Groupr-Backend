@@ -18,7 +18,7 @@ public final class CoursesController: ResourceRepresentable {
             destroy: destroy
         )
     }
-    
+
     public func registerRoutes() {
         droplet.group("courses", ":id") { courses in
             courses.get("users", handler: users)
@@ -78,7 +78,7 @@ public final class CoursesController: ResourceRepresentable {
         ]))
         return ret_course
     }
-    
+
     /// GET: Returns the users enrolled in a course
     public func users(request: Request) throws -> ResponseRepresentable {
         guard let courseId = request.parameters["id"]?.int else {
@@ -93,14 +93,10 @@ public final class CoursesController: ResourceRepresentable {
             // Auth token not provided or token not valid
             return try JSON(node: ["error" : "Not authorized"]).makeResponse()
         }
-        if try course.users().filter("id", user.id!).all().isEmpty {
-            // User making request is not enrolled in the specified course
-            return try JSON(node: ["error" : "Not authorized"]).makeResponse()
-        }
-        
+
         return try JSON(node: course.users().all().makeNode(context: UserSensitiveContext()))
     }
-    
+
     /// POST: Adds a user to a course
     public func addUser(request: Request) throws -> ResponseRepresentable {
         guard let courseId = request.parameters["id"]?.int else {
@@ -129,10 +125,10 @@ public final class CoursesController: ResourceRepresentable {
         }
         var pivot = Pivot<Course, User>(course, user)
         try pivot.save()
-        
+
         return try JSON(node: ["Success": "User added"])
     }
-    
+
     public func groups(request: Request) throws -> ResponseRepresentable {
         guard let courseId = request.parameters["id"]?.int else {
             // Bad course id in request
@@ -144,7 +140,7 @@ public final class CoursesController: ResourceRepresentable {
         }
         return try JSON(node: course.groups().all().makeNode(context: GroupResponseContext()))
     }
-    
+
     public func addGroup(request: Request) throws -> ResponseRepresentable {
         guard let courseId = request.parameters["id"]?.int else {
             // Bad course id in request
