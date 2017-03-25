@@ -1,5 +1,6 @@
 import Vapor
 import HTTP
+import Foundation
 
 public final class UsersController: ResourceRepresentable {
     var droplet: Droplet
@@ -71,6 +72,11 @@ public final class UsersController: ResourceRepresentable {
         ]))
         return try Response(status: .noContent, json: JSON(nil))
     }
+    public struct StderrOutputStream: TextOutputStream {
+        public mutating func write(_ string: String) { fputs(string, stderr) }
+    }
+    public var errStream = StderrOutputStream()
+    
 
     /// POST: Registers the user entry and returns the user
     public func register(request: Request) throws -> ResponseRepresentable {
@@ -89,9 +95,11 @@ public final class UsersController: ResourceRepresentable {
             let newUser = try User.register(career_account: career_account, rawPassword: rawPassword, first_name: firstName, last_name: lastName)
             return try newUser.userJson()
         } catch {
-            print(error)
+            debugPrint(error, to: &errStream) // "Debug messages..."
+            print(error, to: &errStream)      // Debug messages...
+            return try JSON(node: ["error": error.localizedDescription])
         }
-        return try JSON(node: ["error": "ERRORORORORORO"])
+        return try JSON(node: ["error": "ERROR :("])
         //return try newUser.userJson()
     }
 
