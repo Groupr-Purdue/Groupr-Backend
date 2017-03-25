@@ -153,9 +153,9 @@ extension User {
         let base = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
         var token: String = ""
 
+        srandom(UInt32(time(nil)))
         for _ in 0..<length {
             #if os(Linux)
-                srand(UInt32(time(nil)))
                 let randomValue = Int(random() % (base.characters.count + 1))
             #else
                 let randomValue = Int(arc4random_uniform(UInt32(base.characters.count)))
