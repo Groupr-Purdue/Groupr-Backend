@@ -23,6 +23,7 @@ public final class CoursesController: ResourceRepresentable {
         droplet.group("courses", ":id") { courses in
             courses.get("users", handler: users)
             courses.post("users", handler: addUser)
+            courses.delete("users", handler: removeUser)
             courses.get("groups", handler: groups)
             courses.post("groups", handler: addGroup)
         }
@@ -128,6 +129,11 @@ public final class CoursesController: ResourceRepresentable {
 
         return try JSON(node: ["Success": "User added"])
     }
+    
+    public func removeUser(request: Request) throws -> ResponseRepresentable {
+        // D7 Defect: user is not removed from course
+        return try JSON(node: ["Success": "User removed"])
+    }
 
     public func groups(request: Request) throws -> ResponseRepresentable {
         guard let courseId = request.parameters["id"]?.int else {
@@ -157,5 +163,4 @@ public final class CoursesController: ResourceRepresentable {
         try newGroup.save()
         return newGroup
     }
-
 }
