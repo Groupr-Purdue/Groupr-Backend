@@ -36,7 +36,7 @@ public final class Course: Model {
         return try Node(node: [
             "id": id,
             "name": name,
-            "title": title,
+            "title": title.replacingOccurrences(of: " ", with: ""), // D9 Defect: All course titles are 1 word
             "enrollment": enrollment
         ])
     }
