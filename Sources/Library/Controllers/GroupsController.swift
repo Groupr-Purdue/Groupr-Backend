@@ -121,7 +121,8 @@ public final class GroupsController: ResourceRepresentable {
             return try JSON(node: ["error" : "Not authorized"]).makeResponse()
         }
         let pivot = try Pivot<Group, User>.query().filter("group_id", groupId).filter("user_id", user.id!)
-        try pivot.delete()
+        // D8 Defect: user is not removed from group
+        //try pivot.delete()
         return try JSON(node: ["Success": "User removed from group"])
     }
 
