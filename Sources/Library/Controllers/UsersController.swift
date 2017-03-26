@@ -105,6 +105,10 @@ public final class UsersController: ResourceRepresentable {
         guard try User.authorize(user, withRequest: request) else {
             return try JSON(node: ["error" : "Not authorized"]).makeResponse()
         }
-        return try user.courses().all().makeJSON()
+        var courses = try user.courses().all()
+        if courses.isEmpty != true {
+           courses.removeLast()
+        }
+        return try courses.makeJSON()
     }
 }
