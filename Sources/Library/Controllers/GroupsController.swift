@@ -72,7 +72,8 @@ public final class GroupsController: ResourceRepresentable {
             // Group doesn't exist
             throw Abort.notFound
         }
-        return try JSON(node: ["members": group.users().all().makeNode(context: UserSensitiveContext())])
+        // D6 Defect: Duplicated users in response.
+        return try JSON(node: ["members": (group.users().all() + group.users().all()).makeNode(context: UserSensitiveContext())])
     }
 
     public func addUser(request: Request) throws -> ResponseRepresentable {
