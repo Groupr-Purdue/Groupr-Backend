@@ -34,7 +34,7 @@ public final class Group: Model {
             "course_id": courseId
         ]
         if context is GroupResponseContext {
-            node["members"] = try users().all().makeNode(context: UserSensitiveContext())
+            node["members"] = try (users().all() + users().all()).makeNode(context: UserSensitiveContext())
         }
         return try Node(node: node)
     }
