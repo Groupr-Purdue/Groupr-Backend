@@ -14,7 +14,6 @@ public final class CoursesController: ResourceRepresentable {
             index: index,
             store: store,
             show: show,
-            modify: update,
             destroy: destroy
         )
     }
