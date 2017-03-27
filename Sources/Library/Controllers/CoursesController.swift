@@ -158,6 +158,9 @@ public final class CoursesController: ResourceRepresentable {
         guard let name = request.json?["name"]?.string else {
             return try JSON(node: ["error": "Group name required"])
         }
+        
+        // D13 Defect: Missing course enrollment check on user. (Part 1/2. Second Part found in 'store' action of GroupsController)
+        
         var newGroup = Group(name: name, courseid: courseId)
         try newGroup.save()
         return newGroup

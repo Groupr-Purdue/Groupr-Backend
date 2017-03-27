@@ -37,6 +37,9 @@ public final class GroupsController: ResourceRepresentable {
             // Course doesn't exist
             return try Response(status: .notFound, headers: ["Content-Type" : "application/json"], body: JSON(node: ["failure": "Course does not exist"]))
         }
+        
+        // D13 Defect: Missing course enrollment check on user. (Part 2/2. First Part found in 'addGroup' action of CoursesController)
+        
         try group.save()
         try RealtimeController.send(try JSON(node: [
             "endpoint": "groups",
