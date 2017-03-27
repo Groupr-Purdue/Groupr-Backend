@@ -95,7 +95,7 @@ public final class User: Model {
     public func courses() throws -> Siblings<Course> {
         return try siblings()
     }
-    
+
     /// Define a many-to-many ER relationship with Course.
     public func groups() throws -> Siblings<Group> {
         return try siblings()
@@ -179,9 +179,6 @@ extension User {
     /// Checks to see if the authorization token in the request correlates to a given user
     class public func authorize(_ user: User, withRequest request: Request) throws -> Bool{
         guard let currentUser = try User.authenticateWithToken(fromRequest: request) else {
-            return false
-        }
-        guard currentUser.id == user.id else {
             return false
         }
         return true
