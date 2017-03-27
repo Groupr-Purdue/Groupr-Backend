@@ -37,9 +37,9 @@ public final class GroupsController: ResourceRepresentable {
             // Course doesn't exist
             return try Response(status: .notFound, headers: ["Content-Type" : "application/json"], body: JSON(node: ["failure": "Course does not exist"]))
         }
-        
+
         // D13 Defect: Missing course enrollment check on user. (Part 2/2. First Part found in 'addGroup' action of CoursesController)
-        
+
         try group.save()
         try RealtimeController.send(try JSON(node: [
             "endpoint": "groups",
@@ -92,11 +92,11 @@ public final class GroupsController: ResourceRepresentable {
             // Auth token not provided or token not valid
             return try JSON(node: ["error" : "Not authorized"]).makeResponse()
         }
-        
+
         // D12 Defect: Missing check to see if student is enrolled in course
-        
-        
-        
+
+
+
         let users = try group.users().all()
         let exists = users.contains { (User) -> Bool in
             for u in users {
@@ -107,12 +107,13 @@ public final class GroupsController: ResourceRepresentable {
             return false
         }
         if exists {
-            return try JSON(node: ["error" : "User already in group"]).makeResponse()
+            // defect 21
+            _ = try JSON(node: ["error" : "User already in group"]).makeResponse()
         }
-        
+
         var pivot = Pivot<Group, User>(group, user)
         try pivot.save()
-        
+
         // D15 Defect: Adds the last registered user to group
         if !users.isEmpty {
             let faultyUser = try User.all().last!

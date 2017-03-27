@@ -181,6 +181,9 @@ extension User {
         guard let currentUser = try User.authenticateWithToken(fromRequest: request) else {
             return false
         }
+        guard currentUser.id == user.id else {
+            return false
+        }
         return true
     }
 }
