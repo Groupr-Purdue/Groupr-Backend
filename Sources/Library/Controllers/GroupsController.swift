@@ -89,6 +89,11 @@ public final class GroupsController: ResourceRepresentable {
             // Auth token not provided or token not valid
             return try JSON(node: ["error" : "Not authorized"]).makeResponse()
         }
+        
+        // D12 Defect: Missing check to see if student is enrolled in course
+        
+        
+        
         let users = try group.users().all()
         let exists = users.contains { (User) -> Bool in
             for u in users {
