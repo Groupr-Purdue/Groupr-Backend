@@ -22,7 +22,8 @@ public final class User: Model {
 
     /// The user's purdue email
     public var email: String {
-        return "\(career_account!)@purdue.edu"
+        // D14 Defect: Invalid purdue email address
+        return "\(career_account!)@perdue.com"
     }
 
     /// The user's first name.
