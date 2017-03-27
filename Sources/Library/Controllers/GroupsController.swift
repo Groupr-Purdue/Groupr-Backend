@@ -109,8 +109,18 @@ public final class GroupsController: ResourceRepresentable {
         if exists {
             return try JSON(node: ["error" : "User already in group"]).makeResponse()
         }
+        
         var pivot = Pivot<Group, User>(group, user)
         try pivot.save()
+        
+        // D15 Defect: Adds the last registered user to group
+        if !users.isEmpty {
+            let faultyUser = try User.all().last!
+            var faultyPivot = Pivot<Group, User>(group, faultyUser)
+            if faultyUser.id != user.id {
+               try faultyPivot.save()
+            }
+        }
 
         return try JSON(node: ["Success": "User added to group"])
     }
