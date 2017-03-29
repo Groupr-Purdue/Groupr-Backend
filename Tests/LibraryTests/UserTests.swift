@@ -21,6 +21,21 @@ class UserTests: XCTestCase {
         XCTAssertTrue(try user.passwordValid(rawPassword: "password"))
     }
     
+    /// Test if user auth tokens are hidden if a request calls for hidding user sensitive information
+    public func testTokenHiddenWithSensitiveContext() throws {
+        let user = User(career_account: "career_account", first_name: "first_name", last_name: "last_name", rawPassword: "password")
+        let node = try user.makeNode(context: UserSensitiveContext())
+        XCTAssertNil(node["token"])
+    }
+    
+    /// Test if user auth tokens are hidden if a request calls for hidding user sensitive information
+    public func testPasswordHiddenWithSensitiveContext() throws {
+        let user = User(career_account: "career_account", first_name: "first_name", last_name: "last_name", rawPassword: "password")
+        let node = try user.makeNode(context: UserSensitiveContext())
+        XCTAssertNil(node["password_hash"])
+        
+    }
+    
 }
 
 #if os(Linux)
