@@ -71,6 +71,7 @@ public final class User: Model {
             "token": token,
             ]
         if context is UserSensitiveContext {
+            node["email"] = self.email
             node.removeValue(forKey: "password_hash")
             node.removeValue(forKey: "token")
         }
