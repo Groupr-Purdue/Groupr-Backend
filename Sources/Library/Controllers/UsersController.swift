@@ -32,11 +32,11 @@ public final class UsersController: ResourceRepresentable {
 
     /// GET: Show the user entry.
     public func show(request: Request, user: User) throws -> ResponseRepresentable {
-        guard try User.authorize(user, withRequest: request) else {
+        guard ((try User.authenticateWithToken(fromRequest: request)) != nil) else {
             return try JSON(node: ["error" : "Not authorized"])
         }
 
-        return try user.userJson()
+        return try JSON(node: user.makeNode(context: UserSensitiveContext()))
     }
 
     /// Patch: Update the user entry.
