@@ -23,6 +23,7 @@ public final class CoursesController: ResourceRepresentable {
         droplet.group("courses", ":id") { courses in
             courses.get("users", handler: users)
             courses.post("users", handler: addUser)
+            courses.delete("users", handler: removeUser)
             courses.get("groups", handler: groups)
             courses.post("groups", handler: addGroup)
         }
@@ -131,6 +132,38 @@ public final class CoursesController: ResourceRepresentable {
         try pivot.save()
         
         return try JSON(node: ["Success": "User added"])
+    }
+    
+    /// DELETE: Removes a user to a course
+    public func removeUser(request: Request) throws -> ResponseRepresentable {
+        guard let courseId = request.parameters["id"]?.int else {
+            // Bad course id in request
+            throw Abort.badRequest
+        }
+        guard let course = try Course.find(courseId) else {
+            // Course doesn't exist
+            throw Abort.notFound
+        }
+        guard let user = try User.authenticateWithToken(fromRequest: request) else {
+            // Auth token not provided or token not valid
+            return try JSON(node: ["error" : "Not authorized"]).makeResponse()
+        }
+        let users = try course.users().all()
+        let exists = users.contains { (User) -> Bool in
+            for u in users {
+                if u.id == user.id {
+                    return true
+                }
+            }
+            return false
+        }
+        if exists {
+            let pivot = try Pivot<Course, User>.query().filter("course_id", courseId).filter("user_id", user.id!)
+            try pivot.delete()
+            return try JSON(node: ["Success": "User removed"])
+        }
+        
+        return try Response(status: .badRequest, headers: ["Content-Type" : "application/json"], body: JSON(node: ["failure": "User not in course"]))
     }
     
     public func groups(request: Request) throws -> ResponseRepresentable {
